@@ -15,25 +15,60 @@ const viewContainer = document.getElementById("viewContainer");
 const buttons = document.querySelectorAll(".channel-btn");
 const appContainer = document.getElementById("appContainer");
 const versionLabel = document.getElementById("versionLabel");
+const contrastSlider = document.getElementById("contrastSlider");
+const brightnessSlider = document.getElementById("brightnessSlider");
+const compareBtn = document.getElementById("compareBtn");
 
-if (versionLabel) versionLabel.textContent = "v14.0";
+if (versionLabel) versionLabel.textContent = "v15.0";
 
 let currentStream = null;
 let isFrozen = false;
 let currentFacingMode = "environment";
 
+/* View transformation state */
 let scale = 1;
 let translateX = 0;
 let translateY = 0;
-let rotation = 0; // State variable for rotation angle
+let rotation = 0;
 let lastTouchX = 0;
 let lastTouchY = 0;
 let lastHypot = 0;
+
+/* --- MENU & UI LOGIC --- */
 
 menuToggle.addEventListener("click", () => {
   sideMenu.classList.toggle("active");
   menuToggle.textContent = sideMenu.classList.contains("active") ? "✕" : "☰";
 });
+
+function closeMenu() {
+  sideMenu.classList.remove("active");
+  menuToggle.textContent = "☰";
+}
+
+/* --- ADjustment LOGIC --- */
+
+function updateAdjustments() {
+  viewContainer.style.setProperty("--contrast", `${contrastSlider.value}%`);
+  viewContainer.style.setProperty("--brightness", `${brightnessSlider.value}%`);
+}
+
+contrastSlider.addEventListener("input", updateAdjustments);
+brightnessSlider.addEventListener("input", updateAdjustments);
+
+/* Hold-to-compare functionality */
+const startCompare = () => viewContainer.classList.add("no-filter");
+const endCompare = () => viewContainer.classList.remove("no-filter");
+
+compareBtn.addEventListener("mousedown", startCompare);
+compareBtn.addEventListener("mouseup", endCompare);
+compareBtn.addEventListener("touchstart", (e) => {
+  e.preventDefault();
+  startCompare();
+});
+compareBtn.addEventListener("touchend", endCompare);
+
+/* --- IMAGE & CAMERA LOGIC --- */
 
 imageInput.addEventListener("change", function (event) {
   stopCamera();
@@ -83,7 +118,6 @@ switchBtn.addEventListener("click", () => {
   startCamera();
 });
 
-// Rotate current view by 90 degrees clockwise
 rotateBtn.addEventListener("click", () => {
   rotation = (rotation + 90) % 360;
   applyTransform();
@@ -101,11 +135,6 @@ freezeBtn.addEventListener("click", () => {
 });
 
 stopBtn.addEventListener("click", () => stopCamera(true));
-
-function closeMenu() {
-  sideMenu.classList.remove("active");
-  menuToggle.textContent = "☰";
-}
 
 function stopCamera(fullReset = true) {
   if (currentStream) {
@@ -152,10 +181,13 @@ function setFilter(color) {
   appContainer.className = `container theme-${color}`;
   viewContainer.classList.remove("filter-red", "filter-green", "filter-blue");
   viewContainer.classList.add(`filter-${color}`);
+  updateAdjustments(); /* Ensure current slider values are applied to the active filter */
   buttons.forEach((btn) =>
     btn.classList.toggle("active", btn.dataset.filter === color)
   );
 }
+
+/* --- TRANSFORMATION (ZOOM/PAN) LOGIC --- */
 
 function resetTransform() {
   scale = 1;
@@ -169,7 +201,6 @@ function applyTransform() {
   const target = videoFeed.classList.contains("hidden")
     ? decodedImage
     : videoFeed;
-  /* Rotation added to the transformation string */
   if (target)
     target.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale}) rotate(${rotation}deg)`;
 }

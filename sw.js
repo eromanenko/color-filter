@@ -1,4 +1,4 @@
-const VERSION = "14.0";
+const VERSION = "15.0";
 const CACHE_NAME = `color-decoder-v${VERSION}`;
 const urlsToCache = [
   "./",
@@ -7,7 +7,7 @@ const urlsToCache = [
   "./app.js",
   "./manifest.json",
   "./icon-192.png",
-  "./icon-512.jpg",
+  "./icon-512.png",
 ];
 
 self.addEventListener("install", (event) => {

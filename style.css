@@ -50,9 +50,7 @@ h1 { color: #ff5252; margin-bottom: 20px; }
 .menu-content {
     padding: 80px 20px 20px;
     display: flex; flex-direction: column; gap: 15px;
-    /* Fill height to allow pushing version to bottom */
-    height: 100%;
-    box-sizing: border-box;
+    height: 100%; box-sizing: border-box;
 }
 
 .menu-item {
@@ -78,14 +76,11 @@ hr {
 .channel-btn.active[data-filter="green"] { background: #4caf50; }
 .channel-btn.active[data-filter="blue"] { background: #03a9f4; }
 
-.version-label {
-    /* Push to the very bottom of the menu container */
-    margin-top: auto;
-    font-size: 0.8rem;
-    color: #888;
-    text-align: center;
-    padding: 10px 0;
-}
+.slider-container { text-align: left; margin-bottom: 5px; }
+.slider-container label { font-size: 0.8rem; color: #bbb; display: block; margin-bottom: 2px; }
+.slider-container input[type="range"] { width: 100%; cursor: pointer; }
+
+.version-label { margin-top: auto; font-size: 0.8rem; color: #888; text-align: center; padding: 10px 0; }
 
 .view-container {
     position: absolute; top: 0; left: 0;
@@ -102,9 +97,13 @@ video, img {
 
 .hidden { display: none !important; }
 
-.filter-red { filter: url(#redChannelFilter) contrast(200%) brightness(110%); }
-.filter-green { filter: url(#greenChannelFilter) contrast(200%) brightness(110%); }
-.filter-blue { filter: url(#blueChannelFilter) contrast(200%) brightness(110%); }
+/* Filter presets using CSS variables for live tuning */
+.filter-red { filter: url(#redChannelFilter) contrast(var(--contrast)) brightness(var(--brightness)); }
+.filter-green { filter: url(#greenChannelFilter) contrast(var(--contrast)) brightness(var(--brightness)); }
+.filter-blue { filter: url(#blueChannelFilter) contrast(var(--contrast)) brightness(var(--brightness)); }
+
+/* Utility to bypass filter during comparison */
+.no-filter { filter: none !important; }
 
 .theme-red h1 { color: #ff5252; }
 .theme-green h1 { color: #4caf50; }
