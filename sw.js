@@ -1,4 +1,5 @@
-const VERSION = 4;
+/* Cache version bump for camera switching logic and button UI */
+const VERSION = 1;
 const CACHE_NAME = `color-decoder-v${VERSION}`;
 const urlsToCache = [
   "./",
@@ -7,7 +8,7 @@ const urlsToCache = [
   "./app.js",
   "./manifest.json",
   "./icon-192.png",
-  "./icon-512.png",
+  "./icon-512.jpg",
 ];
 
 self.addEventListener("install", (event) => {

@@ -1,5 +1,8 @@
 const imageInput = document.getElementById("imageInput");
 const cameraBtn = document.getElementById("cameraBtn");
+const switchBtn = document.getElementById("switchBtn");
+const freezeBtn = document.getElementById("freezeBtn");
+const stopBtn = document.getElementById("stopBtn");
 const videoFeed = document.getElementById("videoFeed");
 const decodedImage = document.getElementById("decodedImage");
 const viewContainer = document.getElementById("viewContainer");
@@ -8,8 +11,10 @@ const buttons = document.querySelectorAll(".channel-btn");
 const mainContainer = document.querySelector(".container");
 
 let currentStream = null;
+let isFrozen = false;
+/* 'environment' targets back camera, 'user' targets front camera */
+let currentFacingMode = "environment";
 
-/* Handle static image upload */
 imageInput.addEventListener("change", function (event) {
   stopCamera();
   const file = event.target.files[0];
@@ -24,27 +29,70 @@ imageInput.addEventListener("change", function (event) {
   }
 });
 
-/* Request camera access and start live stream */
-cameraBtn.addEventListener("click", async () => {
+async function startCamera() {
+  stopCamera(false); /* Stop previous tracks but keep UI elements visible */
   try {
-    /* Using 'environment' facing mode for rear camera on mobile devices */
     const stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: "environment" },
+      video: { facingMode: currentFacingMode },
     });
     currentStream = stream;
     videoFeed.srcObject = stream;
+
+    cameraBtn.classList.add("hidden");
+    switchBtn.classList.remove("hidden");
+    freezeBtn.classList.remove("hidden");
+    stopBtn.classList.remove("hidden");
+
     showView("video");
-    setFilter("red");
+    /* Ensure existing filter remains applied to the new video stream */
+    const activeBtn = document.querySelector(".channel-btn.active");
+    setFilter(activeBtn ? activeBtn.dataset.filter : "red");
   } catch (err) {
-    console.error("Camera access denied:", err);
-    alert("Camera access is required for live view.");
+    console.error("Camera access error:", err);
+    alert("Unable to access camera.");
   }
+}
+
+cameraBtn.addEventListener("click", startCamera);
+
+switchBtn.addEventListener("click", () => {
+  currentFacingMode =
+    currentFacingMode === "environment" ? "user" : "environment";
+  startCamera();
 });
 
-function stopCamera() {
+freezeBtn.addEventListener("click", () => {
+  if (isFrozen) {
+    videoFeed.play();
+    freezeBtn.textContent = "❄️ Freeze";
+  } else {
+    videoFeed.pause();
+    freezeBtn.textContent = "▶️ Unfreeze";
+  }
+  isFrozen = !isFrozen;
+});
+
+stopBtn.addEventListener("click", () => stopCamera(true));
+
+function stopCamera(fullReset = true) {
   if (currentStream) {
     currentStream.getTracks().forEach((track) => track.stop());
     currentStream = null;
+  }
+
+  if (fullReset) {
+    videoFeed.pause();
+    videoFeed.srcObject = null;
+    isFrozen = false;
+    freezeBtn.textContent = "❄️ Freeze";
+
+    cameraBtn.classList.remove("hidden");
+    switchBtn.classList.add("hidden");
+    freezeBtn.classList.add("hidden");
+    stopBtn.classList.add("hidden");
+
+    viewContainer.classList.add("hidden");
+    controls.classList.add("hidden");
   }
 }
 
@@ -62,12 +110,10 @@ function showView(type) {
 
 function setFilter(color) {
   mainContainer.className = `container theme-${color}`;
-
   const target = videoFeed.classList.contains("hidden")
     ? decodedImage
     : videoFeed;
 
-  /* Apply filter class to the active view element */
   [videoFeed, decodedImage].forEach((el) => {
     el.classList.remove("filter-red", "filter-green", "filter-blue");
   });

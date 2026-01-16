@@ -42,8 +42,12 @@
         
         <div class="main-controls">
             <input type="file" id="imageInput" accept="image/*">
-            <label for="imageInput" class="upload-btn">📁 Select image</label>
+            <label for="imageInput" id="uploadLabel" class="upload-btn">📁 Select image</label>
+            
             <button id="cameraBtn" class="upload-btn">📷 Live Camera</button>
+            <button id="switchBtn" class="upload-btn hidden">🔄 Switch</button>
+            <button id="freezeBtn" class="upload-btn hidden">❄️ Freeze</button>
+            <button id="stopBtn" class="upload-btn hidden">⏹️ Stop</button>
         </div>
 
         <div id="controls" class="hidden">

@@ -38,7 +38,6 @@ input[type="file"] {
     background-color: #d32f2f;
 }
 
-/* UI Theme synchronization */
 .theme-red .upload-btn { background-color: #d32f2f; }
 .theme-green .upload-btn { background-color: #2e7d32; }
 .theme-blue .upload-btn { background-color: #1565c0; }
@@ -53,7 +52,7 @@ input[type="file"] {
     justify-content: center;
     gap: 10px;
 }
-#controls.hidden { display: none; }
+#controls.hidden { display: none !important; }
 
 .channel-btn {
     background: #444;
@@ -88,7 +87,7 @@ input[type="file"] {
     border-radius: 8px;
     background: #000;
 }
-#viewContainer.hidden { display: none; }
+#viewContainer.hidden { display: none !important; }
 
 video, img {
     max-width: 100%;
@@ -97,8 +96,3 @@ video, img {
 }
 
 .hidden { display: none !important; }
-
-/* Real-time filters applied to both video and images */
-.filter-red { filter: url(#redChannelFilter) contrast(250%) brightness(120%); }
-.filter-green { filter: url(#greenChannelFilter) contrast(250%) brightness(120%); }
-.filter-blue { filter: url(#blueChannelFilter) contrast(250%) brightness(120%); }
