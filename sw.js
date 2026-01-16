@@ -1,5 +1,4 @@
-/* VERSION Forced update logic added */
-const VERSION = 12;
+const VERSION = "14.0";
 const CACHE_NAME = `color-decoder-v${VERSION}`;
 const urlsToCache = [
   "./",
@@ -8,11 +7,10 @@ const urlsToCache = [
   "./app.js",
   "./manifest.json",
   "./icon-192.png",
-  "./icon-512.png",
+  "./icon-512.jpg",
 ];
 
 self.addEventListener("install", (event) => {
-  /* skipWaiting forces the waiting service worker to become the active service worker */
   self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => cache.addAll(urlsToCache))
@@ -20,7 +18,6 @@ self.addEventListener("install", (event) => {
 });
 
 self.addEventListener("activate", (event) => {
-  /* clients.claim allows the service worker to take control of pages immediately */
   event.waitUntil(
     Promise.all([
       self.clients.claim(),

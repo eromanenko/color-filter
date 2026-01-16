@@ -1,6 +1,7 @@
 const imageInput = document.getElementById("imageInput");
 const cameraBtn = document.getElementById("cameraBtn");
 const landingCameraBtn = document.getElementById("landingCameraBtn");
+const rotateBtn = document.getElementById("rotateBtn");
 const switchBtn = document.getElementById("switchBtn");
 const freezeBtn = document.getElementById("freezeBtn");
 const stopBtn = document.getElementById("stopBtn");
@@ -13,15 +14,18 @@ const decodedImage = document.getElementById("decodedImage");
 const viewContainer = document.getElementById("viewContainer");
 const buttons = document.querySelectorAll(".channel-btn");
 const appContainer = document.getElementById("appContainer");
+const versionLabel = document.getElementById("versionLabel");
+
+if (versionLabel) versionLabel.textContent = "v14.0";
 
 let currentStream = null;
 let isFrozen = false;
 let currentFacingMode = "environment";
 
-/* Transformation states for Zoom and Pan */
 let scale = 1;
 let translateX = 0;
 let translateY = 0;
+let rotation = 0; // State variable for rotation angle
 let lastTouchX = 0;
 let lastTouchY = 0;
 let lastHypot = 0;
@@ -58,6 +62,7 @@ async function startCamera() {
     resetTransform();
 
     switchBtn.classList.remove("hidden");
+    rotateBtn.classList.remove("hidden");
     freezeBtn.classList.remove("hidden");
     stopBtn.classList.remove("hidden");
 
@@ -76,6 +81,12 @@ switchBtn.addEventListener("click", () => {
   currentFacingMode =
     currentFacingMode === "environment" ? "user" : "environment";
   startCamera();
+});
+
+// Rotate current view by 90 degrees clockwise
+rotateBtn.addEventListener("click", () => {
+  rotation = (rotation + 90) % 360;
+  applyTransform();
 });
 
 freezeBtn.addEventListener("click", () => {
@@ -114,6 +125,7 @@ function stopCamera(fullReset = true) {
     closeMenu();
 
     switchBtn.classList.add("hidden");
+    rotateBtn.classList.add("hidden");
     freezeBtn.classList.add("hidden");
     stopBtn.classList.add("hidden");
     resetTransform();
@@ -125,6 +137,7 @@ function showView(type) {
   landingControls.classList.add("hidden");
   menuToggle.classList.remove("hidden");
   viewContainer.classList.remove("hidden");
+  rotateBtn.classList.remove("hidden");
 
   if (type === "video") {
     videoFeed.classList.remove("hidden");
@@ -144,12 +157,11 @@ function setFilter(color) {
   );
 }
 
-/* --- ZOOM & PAN LOGIC --- */
-
 function resetTransform() {
   scale = 1;
   translateX = 0;
   translateY = 0;
+  rotation = 0;
   applyTransform();
 }
 
@@ -157,7 +169,9 @@ function applyTransform() {
   const target = videoFeed.classList.contains("hidden")
     ? decodedImage
     : videoFeed;
-  target.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+  /* Rotation added to the transformation string */
+  if (target)
+    target.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale}) rotate(${rotation}deg)`;
 }
 
 viewContainer.addEventListener("touchstart", (e) => {
@@ -174,7 +188,6 @@ viewContainer.addEventListener("touchstart", (e) => {
 
 viewContainer.addEventListener("touchmove", (e) => {
   if (e.touches.length === 1) {
-    /* Panning logic */
     const deltaX = e.touches[0].clientX - lastTouchX;
     const deltaY = e.touches[0].clientY - lastTouchY;
     translateX += deltaX;
@@ -182,15 +195,12 @@ viewContainer.addEventListener("touchmove", (e) => {
     lastTouchX = e.touches[0].clientX;
     lastTouchY = e.touches[0].clientY;
   } else if (e.touches.length === 2) {
-    /* Pinch-to-zoom logic */
     const currentHypot = Math.hypot(
       e.touches[0].clientX - e.touches[1].clientX,
       e.touches[0].clientY - e.touches[1].clientY
     );
     const zoomFactor = currentHypot / lastHypot;
     scale *= zoomFactor;
-
-    /* Bound scale to reasonable values */
     scale = Math.min(Math.max(1, scale), 10);
     lastHypot = currentHypot;
   }
