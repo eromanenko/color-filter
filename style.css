@@ -96,3 +96,7 @@ video, img {
 }
 
 .hidden { display: none !important; }
+
+.filter-red { filter: url(#redChannelFilter) contrast(250%) brightness(120%); }
+.filter-green { filter: url(#greenChannelFilter) contrast(250%) brightness(120%); }
+.filter-blue { filter: url(#blueChannelFilter) contrast(250%) brightness(120%); }

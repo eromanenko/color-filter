@@ -12,7 +12,6 @@ const mainContainer = document.querySelector(".container");
 
 let currentStream = null;
 let isFrozen = false;
-/* 'environment' targets back camera, 'user' targets front camera */
 let currentFacingMode = "environment";
 
 imageInput.addEventListener("change", function (event) {
@@ -30,7 +29,7 @@ imageInput.addEventListener("change", function (event) {
 });
 
 async function startCamera() {
-  stopCamera(false); /* Stop previous tracks but keep UI elements visible */
+  stopCamera(false);
   try {
     const stream = await navigator.mediaDevices.getUserMedia({
       video: { facingMode: currentFacingMode },
@@ -44,7 +43,6 @@ async function startCamera() {
     stopBtn.classList.remove("hidden");
 
     showView("video");
-    /* Ensure existing filter remains applied to the new video stream */
     const activeBtn = document.querySelector(".channel-btn.active");
     setFilter(activeBtn ? activeBtn.dataset.filter : "red");
   } catch (err) {
@@ -130,6 +128,9 @@ buttons.forEach((btn) => {
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js");
+    navigator.serviceWorker.register("./sw.js").then((reg) => {
+      /* Checks for updates on every page load */
+      reg.update();
+    });
   });
 }
