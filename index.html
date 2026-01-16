@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Channel Decoder</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#d32f2f">
+    <link rel="apple-touch-icon" href="icon-192.png">
+</head>
+<body>
+
+    <svg style="position: absolute; width: 0; height: 0; overflow: hidden;">
+        <defs>
+            <filter id="redChannelFilter">
+                <feColorMatrix type="matrix" 
+                  values="1 0 0 0 0
+                          1 0 0 0 0
+                          1 0 0 0 0
+                          0 0 0 1 0" />
+            </filter>
+            <filter id="greenChannelFilter">
+                <feColorMatrix type="matrix" 
+                  values="0 1 0 0 0
+                          0 1 0 0 0
+                          0 1 0 0 0
+                          0 0 0 1 0" />
+            </filter>
+            <filter id="blueChannelFilter">
+                <feColorMatrix type="matrix" 
+                  values="0 0 1 0 0
+                          0 0 1 0 0
+                          0 0 1 0 0
+                          0 0 0 1 0" />
+            </filter>
+        </defs>
+    </svg>
+
+    <main class="container theme-red">
+        <h1>Color Decoder</h1>
+        
+        <div class="main-controls">
+            <input type="file" id="imageInput" accept="image/*">
+            <label for="imageInput" class="upload-btn">📁 Select image</label>
+            <button id="cameraBtn" class="upload-btn">📷 Live Camera</button>
+        </div>
+
+        <div id="controls" class="hidden">
+            <button class="channel-btn" data-filter="red">Red</button>
+            <button class="channel-btn" data-filter="green">Green</button>
+            <button class="channel-btn" data-filter="blue">Blue</button>
+        </div>
+
+        <div id="viewContainer" class="hidden">
+            <video id="videoFeed" autoplay playsinline class="hidden"></video>
+            <img id="decodedImage" alt="Decoded image" class="hidden">
+        </div>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>

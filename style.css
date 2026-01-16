@@ -1,0 +1,104 @@
+body {
+    font-family: sans-serif;
+    background-color: #222;
+    color: #eee;
+    margin: 0;
+    padding: 20px;
+    text-align: center;
+}
+
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+h1 { color: #ff5252; }
+
+input[type="file"] {
+    display: none;
+}
+
+.main-controls {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.upload-btn {
+    display: inline-block;
+    color: white;
+    padding: 15px 25px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    border: none;
+    transition: background-color 0.3s;
+    background-color: #d32f2f;
+}
+
+/* UI Theme synchronization */
+.theme-red .upload-btn { background-color: #d32f2f; }
+.theme-green .upload-btn { background-color: #2e7d32; }
+.theme-blue .upload-btn { background-color: #1565c0; }
+
+.upload-btn:hover {
+    filter: brightness(1.2);
+}
+
+#controls {
+    margin: 10px 0 20px 0;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+#controls.hidden { display: none; }
+
+.channel-btn {
+    background: #444;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: 0.2s;
+}
+
+.channel-btn[data-filter="red"].active { 
+    background-color: #ff5252; 
+    box-shadow: 0 0 10px rgba(255, 82, 82, 0.5); 
+}
+.channel-btn[data-filter="green"].active { 
+    background-color: #4caf50; 
+    box-shadow: 0 0 10px rgba(76, 175, 80, 0.5); 
+}
+.channel-btn[data-filter="blue"].active { 
+    background-color: #03a9f4; 
+    box-shadow: 0 0 10px rgba(3, 169, 244, 0.5); 
+}
+
+.channel-btn.active { font-weight: bold; }
+
+#viewContainer {
+    margin-top: 20px;
+    border: 2px dashed #555;
+    padding: 10px;
+    border-radius: 8px;
+    background: #000;
+}
+#viewContainer.hidden { display: none; }
+
+video, img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+}
+
+.hidden { display: none !important; }
+
+/* Real-time filters applied to both video and images */
+.filter-red { filter: url(#redChannelFilter) contrast(250%) brightness(120%); }
+.filter-green { filter: url(#greenChannelFilter) contrast(250%) brightness(120%); }
+.filter-blue { filter: url(#blueChannelFilter) contrast(250%) brightness(120%); }
