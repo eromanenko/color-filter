@@ -1,5 +1,5 @@
 /* VERSION Forced update logic added */
-const VERSION = 10;
+const VERSION = 12;
 const CACHE_NAME = `color-decoder-v${VERSION}`;
 const urlsToCache = [
   "./",

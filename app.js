@@ -18,6 +18,14 @@ let currentStream = null;
 let isFrozen = false;
 let currentFacingMode = "environment";
 
+/* Transformation states for Zoom and Pan */
+let scale = 1;
+let translateX = 0;
+let translateY = 0;
+let lastTouchX = 0;
+let lastTouchY = 0;
+let lastHypot = 0;
+
 menuToggle.addEventListener("click", () => {
   sideMenu.classList.toggle("active");
   menuToggle.textContent = sideMenu.classList.contains("active") ? "✕" : "☰";
@@ -30,6 +38,7 @@ imageInput.addEventListener("change", function (event) {
     const reader = new FileReader();
     reader.onload = function (e) {
       decodedImage.src = e.target.result;
+      resetTransform();
       showView("image");
       setFilter("red");
       closeMenu();
@@ -46,6 +55,7 @@ async function startCamera() {
     });
     currentStream = stream;
     videoFeed.srcObject = stream;
+    resetTransform();
 
     switchBtn.classList.remove("hidden");
     freezeBtn.classList.remove("hidden");
@@ -106,6 +116,7 @@ function stopCamera(fullReset = true) {
     switchBtn.classList.add("hidden");
     freezeBtn.classList.add("hidden");
     stopBtn.classList.add("hidden");
+    resetTransform();
   }
 }
 
@@ -125,17 +136,66 @@ function showView(type) {
 }
 
 function setFilter(color) {
-  /* Update UI theme */
   appContainer.className = `container theme-${color}`;
-
-  /* Applying filter only to the visible view container ensures stability */
   viewContainer.classList.remove("filter-red", "filter-green", "filter-blue");
   viewContainer.classList.add(`filter-${color}`);
-
   buttons.forEach((btn) =>
     btn.classList.toggle("active", btn.dataset.filter === color)
   );
 }
+
+/* --- ZOOM & PAN LOGIC --- */
+
+function resetTransform() {
+  scale = 1;
+  translateX = 0;
+  translateY = 0;
+  applyTransform();
+}
+
+function applyTransform() {
+  const target = videoFeed.classList.contains("hidden")
+    ? decodedImage
+    : videoFeed;
+  target.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+}
+
+viewContainer.addEventListener("touchstart", (e) => {
+  if (e.touches.length === 1) {
+    lastTouchX = e.touches[0].clientX;
+    lastTouchY = e.touches[0].clientY;
+  } else if (e.touches.length === 2) {
+    lastHypot = Math.hypot(
+      e.touches[0].clientX - e.touches[1].clientX,
+      e.touches[0].clientY - e.touches[1].clientY
+    );
+  }
+});
+
+viewContainer.addEventListener("touchmove", (e) => {
+  if (e.touches.length === 1) {
+    /* Panning logic */
+    const deltaX = e.touches[0].clientX - lastTouchX;
+    const deltaY = e.touches[0].clientY - lastTouchY;
+    translateX += deltaX;
+    translateY += deltaY;
+    lastTouchX = e.touches[0].clientX;
+    lastTouchY = e.touches[0].clientY;
+  } else if (e.touches.length === 2) {
+    /* Pinch-to-zoom logic */
+    const currentHypot = Math.hypot(
+      e.touches[0].clientX - e.touches[1].clientX,
+      e.touches[0].clientY - e.touches[1].clientY
+    );
+    const zoomFactor = currentHypot / lastHypot;
+    scale *= zoomFactor;
+
+    /* Bound scale to reasonable values */
+    scale = Math.min(Math.max(1, scale), 10);
+    lastHypot = currentHypot;
+  }
+  applyTransform();
+});
 
 buttons.forEach((btn) =>
   btn.addEventListener("click", () => setFilter(btn.dataset.filter))
