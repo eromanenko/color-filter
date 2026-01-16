@@ -5,7 +5,7 @@
   "display": "standalone",
   "background_color": "#222222",
   "theme_color": "#d32f2f",
-  "description": "Застосунок для перегляду червоного, зеленого та синього каналів зображень",
+  "description": "Apply color channel filters to images to decode hidden information.",
   "icons": [
     {
       "src": "icon-192.png",

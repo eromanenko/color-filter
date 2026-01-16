@@ -11,54 +11,52 @@
 </head>
 <body>
 
-    <svg style="position: absolute; width: 0; height: 0; overflow: hidden;">
+    <svg style="position: absolute; width: 0; height: 0; pointer-events: none;">
         <defs>
             <filter id="redChannelFilter">
-                <feColorMatrix type="matrix" 
-                  values="1 0 0 0 0
-                          1 0 0 0 0
-                          1 0 0 0 0
-                          0 0 0 1 0" />
+                <feColorMatrix type="matrix" values="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 0 0 0 1 0" />
             </filter>
             <filter id="greenChannelFilter">
-                <feColorMatrix type="matrix" 
-                  values="0 1 0 0 0
-                          0 1 0 0 0
-                          0 1 0 0 0
-                          0 0 0 1 0" />
+                <feColorMatrix type="matrix" values="0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 0 0 1 0" />
             </filter>
             <filter id="blueChannelFilter">
-                <feColorMatrix type="matrix" 
-                  values="0 0 1 0 0
-                          0 0 1 0 0
-                          0 0 1 0 0
-                          0 0 0 1 0" />
+                <feColorMatrix type="matrix" values="0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 0 1 0" />
             </filter>
         </defs>
     </svg>
 
-    <main class="container theme-red">
-        <h1>Color Decoder7</h1>
+    <main id="appContainer" class="container theme-red">
+        <h1 id="mainTitle">Color Decoder</h1>
         
-        <div class="main-controls">
-            <input type="file" id="imageInput" accept="image/*">
-            <label for="imageInput" id="uploadLabel" class="upload-btn">📁 Select image</label>
-            
-            <button id="cameraBtn" class="upload-btn">📷 Live Camera</button>
-            <button id="switchBtn" class="upload-btn hidden">🔄 Switch</button>
-            <button id="freezeBtn" class="upload-btn hidden">❄️ Freeze</button>
-            <button id="stopBtn" class="upload-btn hidden">⏹️ Stop</button>
+        <button id="menuToggle" class="menu-toggle hidden">☰</button>
+
+        <nav id="sideMenu" class="side-menu">
+            <div class="menu-content">
+                <input type="file" id="imageInput" accept="image/*">
+                <label for="imageInput" class="menu-item">📁 Select image</label>
+                <button id="cameraBtn" class="menu-item">📷 Live Camera</button>
+                <button id="switchBtn" class="menu-item hidden">🔄 Switch Camera</button>
+                <button id="freezeBtn" class="menu-item hidden">❄️ Freeze</button>
+                <button id="stopBtn" class="menu-item hidden">⏹️ Stop</button>
+                
+                <hr>
+                <p>Filters:</p>
+                <div class="filter-group">
+                    <button class="channel-btn" data-filter="red">Red</button>
+                    <button class="channel-btn" data-filter="green">Green</button>
+                    <button class="channel-btn" data-filter="blue">Blue</button>
+                </div>
+            </div>
+        </nav>
+
+        <div id="landingControls" class="main-controls">
+            <label for="imageInput" class="upload-btn">📁 Select image</label>
+            <button id="landingCameraBtn" class="upload-btn">📷 Live Camera</button>
         </div>
 
-        <div id="controls" class="hidden">
-            <button class="channel-btn" data-filter="red">Red</button>
-            <button class="channel-btn" data-filter="green">Green</button>
-            <button class="channel-btn" data-filter="blue">Blue</button>
-        </div>
-
-        <div id="viewContainer" class="hidden">
+        <div id="viewContainer" class="view-container hidden">
             <video id="videoFeed" autoplay playsinline class="hidden"></video>
-            <img id="decodedImage" alt="Decoded image" class="hidden">
+            <img id="decodedImage" alt="Decoded" class="hidden">
         </div>
     </main>
 

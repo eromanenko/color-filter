@@ -1,18 +1,27 @@
 const imageInput = document.getElementById("imageInput");
 const cameraBtn = document.getElementById("cameraBtn");
+const landingCameraBtn = document.getElementById("landingCameraBtn");
 const switchBtn = document.getElementById("switchBtn");
 const freezeBtn = document.getElementById("freezeBtn");
 const stopBtn = document.getElementById("stopBtn");
+const menuToggle = document.getElementById("menuToggle");
+const sideMenu = document.getElementById("sideMenu");
+const mainTitle = document.getElementById("mainTitle");
+const landingControls = document.getElementById("landingControls");
 const videoFeed = document.getElementById("videoFeed");
 const decodedImage = document.getElementById("decodedImage");
 const viewContainer = document.getElementById("viewContainer");
-const controls = document.getElementById("controls");
 const buttons = document.querySelectorAll(".channel-btn");
-const mainContainer = document.querySelector(".container");
+const appContainer = document.getElementById("appContainer");
 
 let currentStream = null;
 let isFrozen = false;
 let currentFacingMode = "environment";
+
+menuToggle.addEventListener("click", () => {
+  sideMenu.classList.toggle("active");
+  menuToggle.textContent = sideMenu.classList.contains("active") ? "✕" : "☰";
+});
 
 imageInput.addEventListener("change", function (event) {
   stopCamera();
@@ -23,6 +32,7 @@ imageInput.addEventListener("change", function (event) {
       decodedImage.src = e.target.result;
       showView("image");
       setFilter("red");
+      closeMenu();
     };
     reader.readAsDataURL(file);
   }
@@ -37,21 +47,20 @@ async function startCamera() {
     currentStream = stream;
     videoFeed.srcObject = stream;
 
-    cameraBtn.classList.add("hidden");
     switchBtn.classList.remove("hidden");
     freezeBtn.classList.remove("hidden");
     stopBtn.classList.remove("hidden");
 
     showView("video");
-    const activeBtn = document.querySelector(".channel-btn.active");
-    setFilter(activeBtn ? activeBtn.dataset.filter : "red");
+    setFilter("red");
+    closeMenu();
   } catch (err) {
-    console.error("Camera access error:", err);
-    alert("Unable to access camera.");
+    alert("Camera access error.");
   }
 }
 
 cameraBtn.addEventListener("click", startCamera);
+landingCameraBtn.addEventListener("click", startCamera);
 
 switchBtn.addEventListener("click", () => {
   currentFacingMode =
@@ -72,31 +81,40 @@ freezeBtn.addEventListener("click", () => {
 
 stopBtn.addEventListener("click", () => stopCamera(true));
 
+function closeMenu() {
+  sideMenu.classList.remove("active");
+  menuToggle.textContent = "☰";
+}
+
 function stopCamera(fullReset = true) {
   if (currentStream) {
     currentStream.getTracks().forEach((track) => track.stop());
     currentStream = null;
   }
-
   if (fullReset) {
     videoFeed.pause();
     videoFeed.srcObject = null;
     isFrozen = false;
     freezeBtn.textContent = "❄️ Freeze";
 
-    cameraBtn.classList.remove("hidden");
+    mainTitle.classList.remove("hidden");
+    landingControls.classList.remove("hidden");
+    menuToggle.classList.add("hidden");
+    viewContainer.classList.add("hidden");
+    closeMenu();
+
     switchBtn.classList.add("hidden");
     freezeBtn.classList.add("hidden");
     stopBtn.classList.add("hidden");
-
-    viewContainer.classList.add("hidden");
-    controls.classList.add("hidden");
   }
 }
 
 function showView(type) {
+  mainTitle.classList.add("hidden");
+  landingControls.classList.add("hidden");
+  menuToggle.classList.remove("hidden");
   viewContainer.classList.remove("hidden");
-  controls.classList.remove("hidden");
+
   if (type === "video") {
     videoFeed.classList.remove("hidden");
     decodedImage.classList.add("hidden");
@@ -107,30 +125,24 @@ function showView(type) {
 }
 
 function setFilter(color) {
-  mainContainer.className = `container theme-${color}`;
-  const target = videoFeed.classList.contains("hidden")
-    ? decodedImage
-    : videoFeed;
+  /* Update UI theme */
+  appContainer.className = `container theme-${color}`;
 
-  [videoFeed, decodedImage].forEach((el) => {
-    el.classList.remove("filter-red", "filter-green", "filter-blue");
-  });
-  target.classList.add(`filter-${color}`);
+  /* Applying filter only to the visible view container ensures stability */
+  viewContainer.classList.remove("filter-red", "filter-green", "filter-blue");
+  viewContainer.classList.add(`filter-${color}`);
 
-  buttons.forEach((btn) => {
-    btn.classList.toggle("active", btn.dataset.filter === color);
-  });
+  buttons.forEach((btn) =>
+    btn.classList.toggle("active", btn.dataset.filter === color)
+  );
 }
 
-buttons.forEach((btn) => {
-  btn.addEventListener("click", () => setFilter(btn.dataset.filter));
-});
+buttons.forEach((btn) =>
+  btn.addEventListener("click", () => setFilter(btn.dataset.filter))
+);
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js").then((reg) => {
-      /* Checks for updates on every page load */
-      reg.update();
-    });
+    navigator.serviceWorker.register("./sw.js");
   });
 }
